@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Firebase Storage - 上傳檔案</title>
+
+<style>
+progress {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #ccc;
+    width: 320px;
+    height: 30px;
+}
+progress::-webkit-progress-bar {
+  background-color: #ccc;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3) inset;
+  border-radius: 3px;
+}
+progress::-webkit-progress-value {
+  background-color: #006ac6;
+  border-radius: 3px;
+}
+
+</style>
+
+<!-- Firebase 函式庫 -->
+<script src="https://www.gstatic.com/firebasejs/3.7.3/firebase.js"></script>
+
+<!-- 貼上你的 Firebase 初始化參數 -->
+
+</head>
+<body>
+  <div class="container">
+    <header>
+        <h1>Firebase Cloud Storage upload demo</h1>
+    </header>
+
+    <main>
+      <div>
+          <h6>請選擇檔案上傳到 Firebase Storage bucket</h6>
+          <input type="file" id="file" name="file">
+
+          <progress id="processingbar" value="0" max="100"></progress>
+
+          <div id="result"></div>
+      </div>
+    </main>
+  </div>
+
+<script>
+
+var storageRef = firebase.storage().ref();
+
+function handleFileSelect (evt) {
+
+    var file = evt.target.files[0];
+
+    var metadata = {
+        contentType: file.type
+    };
+
+    var uploadTask = storageRef.child('public/' + file.name).put(file, metadata);
+    uploadTask.then(function (snapshot) {
+        console.log('上傳完成', snapshot);
+        console.log(snapshot.metadata);
+        var url = snapshot.downloadURL;
+
+        var message = '<h2>檔案名稱：' + snapshot.metadata.name + '</h2>';
+        var size = '<p>檔案大小：' + snapshot.totalBytes / 1024 + ' KB </p>';
+        var link = '<p>下載網址：<a href="' +  url + '">' + '點我下載' + '</a></p>';
+
+        document.getElementById('result').innerHTML = message + size + link;
+    }).catch(function (error) {
+        console.error('Upload failed:', error);
+    });
+
+
+
+uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, // or 'state_changed'
+  function(snapshot) {
+    // 根據已傳輸 bytes / 總 bytes 得到進度百分比
+    var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+
+    console.log('Upload is ' + progress + '% done');
+    document.getElementById('processingbar').value = progress;
+
+    switch (snapshot.state) {
+      case firebase.storage.TaskState.PAUSED: // or 'paused'
+        console.log('Upload is paused');
+        break;
+      case firebase.storage.TaskState.RUNNING: // or 'running'
+        console.log('Upload is running');
+        break;
+    }
+  });
+
+}
+
+window.addEventListener('load', function () {
+    document.getElementById('file').addEventListener('change', handleFileSelect);
+});
+</script>
+</body>
+</html>

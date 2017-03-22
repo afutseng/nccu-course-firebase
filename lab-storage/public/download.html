@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Firebase Storage - download demo</title>
+
+<style>
+
+</style>
+
+<!-- Firebase 函式庫 -->
+<script src="https://www.gstatic.com/firebasejs/3.7.3/firebase.js"></script>
+
+<!-- 貼上你的 Firebase 初始化參數 -->
+
+</head>
+<body>
+  <div class="container">
+    <header>
+        <h1>Firebase Cloud Storage download demo</h1>
+    </header>
+
+    <main>
+      <div>
+          <label>輸入 public bucket 裡的檔名：<input type="text" id="filename" placeholder="PIXNET-logo.png">
+          <button id="btn">送出</button>
+
+
+          <div id="result">
+            <img id="picture">
+          </div>
+
+      </div>
+    </main>
+  </div>
+
+<script>
+
+var storage = firebase.storage();
+var storageRef = firebase.storage().ref();
+
+document.getElementById('btn').addEventListener('click', function (e) {
+    var filename = document.getElementById('filename').value;
+    publicRef = storageRef.child('public/' + filename);
+    console.log(publicRef);
+
+    publicRef.getDownloadURL().then(function (url) {
+        console.log('url = ', url);
+
+        var img = document.getElementById('picture');
+        img.src = url;
+    });
+
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Firebase Storage - 上傳檔案</title>
+
+<!-- Firebase 函式庫 -->
+<script src="https://www.gstatic.com/firebasejs/3.7.3/firebase.js"></script>
+
+<!-- 貼上你的 Firebase 初始化參數 -->
+
+</head>
+<body>
+  <div class="container">
+    <header>
+        <h1>Firebase Cloud Storage upload demo</h1>
+    </header>
+
+    <main>
+      <div>
+          <h6>請選擇檔案上傳到 Firebase Storage bucket</h6>
+          <input type="file" id="file" name="file">
+      </div>
+    </main>
+  </div>
+
+<script>
+
+var storageRef = firebase.storage().ref();
+
+function handleFileSelect (evt) {
+
+    var file = evt.target.files[0];
+
+    var metadata = {
+        contentType: file.type
+    };
+
+    storageRef.child('public/' + file.name).put(file, metadata).then(function (snapshot) {
+        console.log('上傳完成', snapshot);
+    }).catch(function (error) {
+        console.error('Upload failed:', error);
+    });
+}
+
+window.addEventListener('load', function () {
+    document.getElementById('file').addEventListener('change', handleFileSelect);
+});
+</script>
+</body>
+</html>
